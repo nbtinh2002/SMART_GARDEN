@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="css/style1.css" />
+    <title>SMART GARDEN</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- top navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="offcanvasExample">
+                <span class="navbar-toggler-icon" data-bs-target="#sidebar"></span>
+            </button>
+            <a class="navbar-brand me-auto ms-lg-0 ms-3 text-uppercase fw-bold" href="#">SMART GARDEN</a>
+        </div>
+    </nav>
+    <!-- top navigation bar -->
+    <!-- offcanvas -->
+    <div class="offcanvas offcanvas-start sidebar-nav bg-dark" tabindex="-1" id="sidebar">
+        <div class="offcanvas-body p-0">
+            <nav class="navbar-dark">
+                <ul class="navbar-nav">
+                    <li>
+                        <div class="text-muted small fw-bold text-uppercase px-3">MEMBERS:</div>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link px-3 active">
+                            <span class="me-2"><i class="bi bi-speedometer2"></i></span>
+                            <span>Tuan - Tu - Tinh - Huy</span>
+                        </a>
+                    </li>
+                    <li class="my-4"><hr class="dropdown-divider bg-light" /></li>
+                    <li>
+                        <div class="text-muted small fw-bold text-uppercase px-3 mb-3">CONTROL</div>
+                    </li>
+                    <li>
+                        <a class="nav-link px-3 sidebar-link" data-bs-toggle="collapse" href="#layouts">
+                            <span class="me-2"><i class="bi bi-layout-split"></i></span>
+                            <span>Auto</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link px-3">
+                            <span class="me-2"><i class="bi bi-book-fill"></i></span>
+                            <span>Chart</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <!-- offcanvas -->
+    <!-- Main -->
+    <main class="mt-5 pt-3">
+        <!-- Control -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Control</h4>
+                </div>
+            </div>
+        </div>
+        <!-- checkbox -->
+        <form action="" id="form">
+            <div class="appliances">
+                <div class="appliance">
+                    <input type="checkbox" name="Light" id="a" value="1" data-column="Light">
+                    <label for="a">
+                        <i class="l"></i>
+                        <strong>Light</strong>
+                        <span data-o=" " data-c=" "></span>
+                        <small></small>
+                    </label>
+                </div>
+                <div class="appliance">
+                    <input type="checkbox" name="Pump" id="b" value="1" data-column="Pump">
+                    <label for="b">
+                        <i class="r"></i>
+                        <strong>Pump</strong>
+                        <span data-o=" " data-c=" "></span>
+                        <small></small>
+                    </label>
+                </div>
+                <div class="appliance">
+                    <input type="checkbox" name="Mode" id="d" value="1" data-column="MODE">
+                    <label for="d">
+                        <i class="f"></i>
+                        <strong>Auto/Manual</strong>
+                        <span data-o=" " data-c=""></span>
+                        <small></small>
+                    </label>
+                </div>
+            </div>
+        </form>
+        <!-- script checkbox here -->
+        <script>
+            $(document).ready(function() {
+                $('input[type="checkbox"]').change(function() {
+                    var column = $(this).data('column'); // Lấy giá trị thuộc tính data-column
+                    var value = $(this).is(':checked') ? 1 : 0; // Xác định giá trị (1 hoặc 0) dựa trên trạng thái của hộp kiểm
+
+                    console.log("Column:", column); // In giá trị column
+                    console.log("Value:", value); // In giá trị value
+
+                    // Gửi dữ liệu đến server
+                    $.post("http://localhost/SIC_FINAL/update_control.php", { column: column, value: value }, function(response) {
+                        console.log(response); // Hiển thị phản hồi từ máy chủ
+                    }).fail(function(xhr, status, error) {
+                        console.log('Lỗi khi cập nhật trạng thái: ' + error); // Hiển thị lỗi nếu yêu cầu không thành công
+                    });
+                });
+
+                function updateCheckboxStatus() {
+                    $.post("http://localhost/SIC_FINAL/update_checkbox.php", function(data) {
+                        var mode = data[0].MODE;
+                        var light = data[0].Light;
+                        var Pump = data[0].Pump;
+
+                        console.log(mode);
+                        console.log(light);
+                        console.log(Pump);
+
+                        $('#a').prop('checked', light == 1);
+                        $('#b').prop('checked', Pump == 1);
+                        $('#d').prop('checked', mode == 1);
+                    }).fail(function(xhr, status, error) {
+                        console.log('Lỗi khi kiểm tra trạng thái: ' + error);
+                    });
+                }
+
+                updateCheckboxStatus();
+                setInterval(updateCheckboxStatus, 1000);
+            });
+        </script>
+        <!-- script checkbox end -->
+        <form action="">
+            <div class="DHT11">
+                <div class="temperature">
+                    <span class="value">Temperature
+                        53%
+                        Humidity
+                        
+                        <table>
+                            <tr>
+                                <td id="temp"></td>
+                            </tr>
+                        </table>
+                    </span>
+                    <span class="name_temp">Temperature</span>
+                </div>
+                <div class="humidity">
+                    <span class="value">
+                        <table>
+                            <tr>
+                                <td id="humid"></td>
+                            </tr>
+                        </table>
+                    </span>
+                    <span class="name_humid">Humidity</span>
+                </div>
+                <div class="humidity2">
+                    <span class="value">
+                        <table>
+                            <tr>
+                                <td id="humid2"></td>
+                            </tr>
+                        </table>
+                    </span>
+                    <span class="name_humid2">Humidity Soil</span>
+                </div>
+            </div>
+        </form>
+        <!-- Thêm phần tử canvas cho biểu đồ -->
+        <div class="charts">
+            <h4>Real-Time Data Visualization</h4>
+            <canvas id="temperatureChart" width="400" height="200"></canvas>
+            <canvas id="humidityChart" width="400" height="200"></canvas>
+            <canvas id="soilMoistureChart" width="400" height="200"></canvas>
+        </div>
+        <script>
+            function updateData() {
+                $.ajax({
+                    url: "http://localhost/SIC_FINAL/getdata.php", // URL đến tệp PHP
+                    type: "POST",
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.length > 0) {
+                            // Giả sử bạn chỉ lấy dữ liệu từ bản ghi đầu tiên
+                            var temp = data[9].Temp_dht11;
+                            var humid = data[9].Humid_dht11;
+                            var humid_soil = data[9].Humid_soil;
+
+                            // Cập nhật nội dung các phần tử HTML
+                            document.getElementById("temp").innerHTML = temp + '°C';
+                            document.getElementById("humid").innerHTML = humid + '%';
+                            document.getElementById("humid2").innerHTML = humid_soil + '%';
+                        } else {
+                            console.log("No data available");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error: " + error);
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                updateData();
+                setInterval(updateData, 1000);
+
+                const temperatureData = [];
+                const humidityData = [];
+                const soilMoistureData = [];
+                const labels = [];
+
+                // Tạo các biểu đồ
+                const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+                const humidityCtx = document.getElementById('humidityChart').getContext('2d');
+                const soilMoistureCtx = document.getElementById('soilMoistureChart').getContext('2d');
+                
+                const temperatureChart = new Chart(temperatureCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Temperature (°C)',
+                            data: temperatureData,
+                            borderColor: '#FF5733',
+                            backgroundColor: 'rgba(255, 87, 51, 0.2)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                const humidityChart = new Chart(humidityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Humidity (%)',
+                            data: humidityData,
+                            borderColor: '#33C1FF',
+                            backgroundColor: 'rgba(51, 193, 255, 0.2)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                const soilMoistureChart = new Chart(soilMoistureCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Soil Moisture (%)',
+                            data: soilMoistureData,
+                            borderColor: '#5CE79D',
+                            backgroundColor: 'rgba(92, 231, 157, 0.2)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Cập nhật biểu đồ với dữ liệu mới
+                function updateCharts(temp, hum, soil) {
+                    const now = new Date().toLocaleTimeString();
+                    labels.push(now);
+                    temperatureData.push(temp);
+                    humidityData.push(hum);
+                    soilMoistureData.push(soil);
+
+                    if (labels.length > 1000) { // Giới hạn số lượng điểm dữ liệu
+                        labels.shift();
+                        temperatureData.shift();
+                        humidityData.shift();
+                        soilMoistureData.shift();
+                    }
+                    
+                    temperatureChart.update();
+                    humidityChart.update();
+                    soilMoistureChart.update();
+                }
+
+                function updateData1() {
+                    $.ajax({
+                        url: "http://localhost/SIC_FINAL/getdata.php", // URL đến tệp PHP
+                        type: "POST",
+                        dataType: "json",
+                        success: function(data) {
+                            if (data.length > 0) {
+                                var temp = data[9].Temp_dht11;
+                                var humid = data[9].Humid_dht11;
+                                var humid_soil = data[9].Humid_soil;
+
+                                // Cập nhật nội dung các phần tử HTML và biểu đồ
+                                updateCharts(temp, humid, humid_soil);
+                            } else {
+                                console.log("No data available");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error: " + error);
+                        }
+                    });
+                }
+
+                // Thêm dữ liệu vào mảng từ dữ liệu hiện có
+                $.ajax({
+                    url: "http://localhost/SIC_FINAL/getdata.php", // URL đến tệp PHP
+                    type: "POST",
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.length > 0) {
+                            for (let i = 0; i < Math.min(10, data.length); i++) {
+                                const temp = data[i].Temp_dht11;
+                                const humid = data[i].Humid_dht11;
+                                const humid_soil = data[i].Humid_soil;
+
+                                temperatureData.push(temp);
+                                humidityData.push(humid);
+                                soilMoistureData.push(humid_soil);
+                                labels.push(`Entry ${i + 1}`);
+                            }
+                            temperatureChart.update();
+                            humidityChart.update();
+                            soilMoistureChart.update();
+                        } else {
+                            console.log("No data available");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error: " + error);
+                    }
+                });
+
+                setInterval(updateData1, 5000);
+            });
+        </script>
+    </main>
+</body>
+</html>
